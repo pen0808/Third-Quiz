@@ -5,6 +5,8 @@
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
 
 <title>Quiz Hub</title>
 
@@ -132,6 +134,17 @@ grid-template-columns:1fr 1fr;
 </header>
 
 <main>
+  <section id="authSection" class="card">
+
+<h2>Start Quiz</h2>
+
+<button id="googleLogin">Sign in with Google</button>
+
+<br><br>
+
+<button onclick="playGuest()">Play as Guest</button>
+
+</section>
 
 <!-- LOGIN / SIGNUP -->
 
@@ -410,6 +423,17 @@ document.getElementById("scoreText").innerHTML =
 `${user}, your score is ${score}/${currentQuiz.length}`
 
 }
+
+const firebaseConfig = {
+apiKey: "AIzaSyBT2lJAmVk0DSeeCqGCFmNHWYij_o0aOWU",
+authDomain: "quiz-1691e.firebaseapp.com",
+projectId: "quiz-1691e",
+appId: "1:827524171077:web:e0d319b3c321c62fcc2a2c",
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
 
 </script>
 
