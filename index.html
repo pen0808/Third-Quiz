@@ -157,6 +157,7 @@ grid-template-columns:1fr 1fr;
 <input id="loginPass" type="password" placeholder="Password">
 
 <button onclick="login()">Sign In</button>
+<button onclick="logout()">Logout</button>
 
 <hr style="margin:20px 0">
 
@@ -434,6 +435,64 @@ appId: "1:827524171077:web:e0d319b3c321c62fcc2a2c",
 firebase.initializeApp(firebaseConfig);
 
 const auth = firebase.auth();
+
+const provider = new firebase.auth.GoogleAuthProvider();
+
+document.getElementById("googleLogin")
+.addEventListener("click", function(){
+
+auth.signInWithPopup(provider)
+.then((result)=>{
+
+const user = result.user;
+
+localStorage.setItem("quizUserName", user.displayName);
+localStorage.setItem("quizUserEmail", user.email);
+localStorage.setItem("quizUserPhoto", user.photoURL);
+
+startCategories();
+
+})
+.catch((error)=>{
+console.log(error);
+});
+
+});
+
+function playGuest(){
+
+localStorage.setItem("quizUserName","Guest");
+
+startCategories();
+
+}
+
+firebase.auth().onAuthStateChanged((user)=>{
+
+if(user){
+
+localStorage.setItem("quizUserName", user.displayName);
+
+startCategories();
+
+}
+
+});
+
+const username = localStorage.getItem("quizUserName");
+
+document.getElementById("welcomeUser").textContent =
+"Welcome " + username;
+
+function logout(){
+
+firebase.auth().signOut();
+
+localStorage.clear();
+
+location.reload();
+
+}
 
 </script>
 
