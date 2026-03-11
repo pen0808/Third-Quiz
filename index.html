@@ -5,10 +5,8 @@
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
 
-<title>Quiz Hub</title>
+<title>Ultimate Quiz Hub</title>
 
 <style>
 
@@ -21,6 +19,7 @@ font-family:Arial, sans-serif;
 
 body{
 background:#f4f6f8;
+color:#333;
 }
 
 header{
@@ -36,8 +35,6 @@ margin:auto;
 padding:20px;
 }
 
-/* CARD */
-
 .card{
 background:white;
 padding:25px;
@@ -46,34 +43,11 @@ box-shadow:0 3px 10px rgba(0,0,0,0.1);
 margin-bottom:20px;
 }
 
-/* FORM */
-
-input{
-width:100%;
-padding:12px;
-margin:10px 0;
-border:1px solid #ccc;
-border-radius:6px;
-}
-
-button{
-padding:12px 18px;
-border:none;
-background:#111;
-color:white;
-border-radius:6px;
-cursor:pointer;
-}
-
-button:hover{
-background:#333;
-}
-
 /* CATEGORY GRID */
 
 .categories{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
 gap:15px;
 }
 
@@ -81,8 +55,8 @@ gap:15px;
 background:#eee;
 padding:20px;
 border-radius:8px;
-cursor:pointer;
 text-align:center;
+cursor:pointer;
 font-weight:bold;
 }
 
@@ -90,24 +64,77 @@ font-weight:bold;
 background:#ddd;
 }
 
-/* QUIZ */
+/* QUIZ HEADER */
+
+.quiz-header{
+display:flex;
+justify-content:space-between;
+margin-bottom:10px;
+font-weight:bold;
+}
+
+.timer{
+color:#e74c3c;
+}
+
+/* PROGRESS BAR */
+
+.progress-bar{
+height:10px;
+background:#ddd;
+border-radius:10px;
+overflow:hidden;
+margin-bottom:15px;
+}
+
+.progress{
+height:100%;
+width:0%;
+background:#27ae60;
+}
+
+/* OPTIONS */
 
 .options button{
 display:block;
 width:100%;
 margin:8px 0;
+padding:12px;
+border:none;
 background:#eee;
-color:#000;
+border-radius:6px;
+cursor:pointer;
 }
 
 .correct{
-background:#27ae60 !important;
+background:#2ecc71 !important;
 color:white;
 }
 
 .wrong{
 background:#e74c3c !important;
 color:white;
+}
+
+.next-btn{
+margin-top:10px;
+padding:12px 18px;
+background:#111;
+color:white;
+border:none;
+border-radius:6px;
+cursor:pointer;
+}
+
+/* LEADERBOARD */
+
+.leaderboard ul{
+list-style:none;
+}
+
+.leaderboard li{
+padding:6px 0;
+border-bottom:1px solid #eee;
 }
 
 /* MOBILE */
@@ -128,88 +155,53 @@ grid-template-columns:1fr 1fr;
 
 <header>
 
-<h1>Quiz Hub</h1>
-<p>Test your knowledge in multiple categories</p>
+<h1>Ultimate Quiz Hub</h1>
+<p>Challenge your knowledge</p>
 
 </header>
 
 <main>
-<!--<section id="authSection" class="card">
 
-<h2>Start Quiz</h2>
+<!-- CATEGORY -->
 
-<button id="googleLogin">Sign in with Google</button>
-
-<br><br>
-
-<button onclick="playGuest()">Play as Guest</button>
-
-</section> -->
-
-<!-- LOGIN / SIGNUP -->
-
-<section id="authSection" class="card">
-
-<h2>Sign In</h2>
-
-<input id="loginUser" placeholder="Username">
-
-<input id="loginPass" type="password" placeholder="Password">
-
-<button onclick="login()">Sign In</button>
-<button onclick="logout()">Logout</button>
-
-<hr style="margin:20px 0">
-
-<h2>Sign Up</h2>
-
-<input id="signupUser" placeholder="Username">
-
-<input id="signupPass" type="password" placeholder="Password">
-
-<button onclick="signup()">Create Account</button>
-
-<hr style="margin:20px 0">
-
-<button onclick="playGuest()">Play as Guest</button>
-
-</section>
-
-
-<!-- CATEGORY PAGE -->
-
-<section id="categorySection" class="card" style="display:none">
+<section id="categorySection" class="card">
 
 <h2>Select Quiz Category</h2>
 
 <div class="categories">
 
-<div class="category" onclick="startCategory('general')">
-General Knowledge
-</div>
+<div class="category" onclick="startCategory('general')">General Knowledge</div>
 
-<div class="category" onclick="startCategory('animals')">
-Animals
-</div>
+<div class="category" onclick="startCategory('animals')">Animals</div>
 
-<div class="category" onclick="startCategory('flags')">
-Country Flags
-</div>
+<div class="category" onclick="startCategory('flags')">Country Flags</div>
 
 </div>
 
 </section>
 
 
-<!-- QUIZ AREA -->
+<!-- QUIZ -->
 
 <section id="quizSection" class="card" style="display:none">
 
+<div class="progress-bar">
+<div id="progress" class="progress"></div>
+</div>
+
+<div class="quiz-header">
+
+<span id="questionNumber"></span>
+
+<span class="timer">Time: <span id="timer">15</span>s</span>
+
+</div>
+
 <h2 id="question"></h2>
 
-<div class="options" id="options"></div>
+<div id="options" class="options"></div>
 
-<button onclick="nextQuestion()">Next</button>
+<button class="next-btn" onclick="nextQuestion()">Next</button>
 
 </section>
 
@@ -220,7 +212,18 @@ Country Flags
 
 <h2 id="scoreText"></h2>
 
-<button onclick="location.reload()">Play Again</button>
+<button onclick="restartQuiz()">Play Again</button>
+
+</section>
+
+
+<!-- LEADERBOARD -->
+
+<section class="card leaderboard">
+
+<h2>Leaderboard</h2>
+
+<ul id="leaderboardList"></ul>
 
 </section>
 
@@ -229,117 +232,70 @@ Country Flags
 
 <script>
 
-/* USERS STORAGE */
-
-function signup(){
-
-let user = document.getElementById("signupUser").value
-let pass = document.getElementById("signupPass").value
-
-let users =
-JSON.parse(localStorage.getItem("quizUsers")) || []
-
-users.push({user,pass})
-
-localStorage.setItem("quizUsers",JSON.stringify(users))
-
-alert("Account created")
-
-}
-
-function login(){
-
-let user = document.getElementById("loginUser").value
-let pass = document.getElementById("loginPass").value
-
-let users =
-JSON.parse(localStorage.getItem("quizUsers")) || []
-
-let found = users.find(u=>u.user===user && u.pass===pass)
-
-if(found){
-
-localStorage.setItem("quizCurrentUser",user)
-
-startCategories()
-
-}else{
-
-alert("Invalid login")
-
-}
-
-}
-
-function playGuest(){
-
-localStorage.setItem("quizCurrentUser","Guest")
-
-startCategories()
-
-}
-
-function startCategories(){
-
-document.getElementById("authSection").style.display="none"
-document.getElementById("categorySection").style.display="block"
-
-}
-
 /* QUIZ DATA */
 
 const quizzes = {
 
 general:[
-{
-question:"What is the capital of France?",
-options:["Paris","London","Rome"],
-answer:"Paris"
-},
-{
-question:"2 + 2 = ?",
-options:["3","4","5"],
-answer:"4"
-}
+{question:"Capital of France?",options:["Paris","Rome","Madrid"],answer:"Paris"},
+{question:"2+5=?",options:["6","7","8"],answer:"7"},
+{question:"Largest ocean?",options:["Pacific","Atlantic","Indian"],answer:"Pacific"},
+{question:"How many continents?",options:["5","6","7"],answer:"7"},
+{question:"Telephone inventor?",options:["Bell","Edison","Tesla"],answer:"Bell"},
+{question:"Closest planet to sun?",options:["Mercury","Venus","Earth"],answer:"Mercury"},
+{question:"Gas humans breathe?",options:["Oxygen","Hydrogen","Carbon"],answer:"Oxygen"},
+{question:"H2O is?",options:["Water","Salt","Oxygen"],answer:"Water"},
+{question:"Largest land animal?",options:["Elephant","Lion","Horse"],answer:"Elephant"},
+{question:"Sun is a?",options:["Star","Planet","Moon"],answer:"Star"}
 ],
 
 animals:[
-{
-question:"Which animal is the king of the jungle?",
-options:["Lion","Tiger","Elephant"],
-answer:"Lion"
-},
-{
-question:"Which animal can fly?",
-options:["Dog","Eagle","Cat"],
-answer:"Eagle"
-}
+{question:"King of jungle?",options:["Lion","Tiger","Bear"],answer:"Lion"},
+{question:"Fastest land animal?",options:["Cheetah","Horse","Dog"],answer:"Cheetah"},
+{question:"Animal that barks?",options:["Dog","Cat","Cow"],answer:"Dog"},
+{question:"Largest animal?",options:["Blue Whale","Elephant","Shark"],answer:"Blue Whale"},
+{question:"Long neck animal?",options:["Giraffe","Horse","Zebra"],answer:"Giraffe"},
+{question:"Bird that can't fly?",options:["Ostrich","Eagle","Parrot"],answer:"Ostrich"},
+{question:"Animal that hops?",options:["Kangaroo","Dog","Horse"],answer:"Kangaroo"},
+{question:"Animal with shell?",options:["Turtle","Dog","Cat"],answer:"Turtle"},
+{question:"Largest cat?",options:["Tiger","Lion","Leopard"],answer:"Tiger"},
+{question:"Water animal?",options:["Fish","Dog","Cat"],answer:"Fish"}
 ],
 
 flags:[
-{
-question:"Which country has a maple leaf flag?",
-options:["Canada","USA","UK"],
-answer:"Canada"
-},
-{
-question:"Green white green flag belongs to?",
-options:["Nigeria","Italy","India"],
-answer:"Nigeria"
-}
+{question:"Maple leaf flag?",options:["Canada","USA","UK"],answer:"Canada"},
+{question:"Green white green?",options:["Nigeria","Italy","India"],answer:"Nigeria"},
+{question:"Stars and stripes?",options:["USA","France","Brazil"],answer:"USA"},
+{question:"Red circle flag?",options:["Japan","China","Korea"],answer:"Japan"},
+{question:"Union Jack?",options:["UK","USA","Australia"],answer:"UK"},
+{question:"Blue yellow flag?",options:["Sweden","Germany","Italy"],answer:"Sweden"},
+{question:"Cedar tree flag?",options:["Lebanon","Iran","Turkey"],answer:"Lebanon"},
+{question:"Yellow star red?",options:["Vietnam","China","Japan"],answer:"Vietnam"},
+{question:"Green white red vertical?",options:["Italy","Ireland","Mexico"],answer:"Italy"},
+{question:"Flag with map?",options:["Cyprus","France","Spain"],answer:"Cyprus"}
 ]
 
 }
 
-/* QUIZ LOGIC */
+/* STATE */
+
+let category = localStorage.getItem("quizCategory")
+let currentQuestion = Number(localStorage.getItem("quizQuestion")) || 0
+let score = Number(localStorage.getItem("quizScore")) || 0
 
 let currentQuiz=[]
-let currentQuestion=0
-let score=0
+let timer
+let timeLeft=15
+
+/* START CATEGORY */
 
 function startCategory(cat){
 
-currentQuiz = quizzes[cat]
+category=cat
+
+localStorage.setItem("quizCategory",cat)
+
+currentQuiz = [...quizzes[cat]].sort(()=>Math.random()-0.5)
 
 document.getElementById("categorySection").style.display="none"
 document.getElementById("quizSection").style.display="block"
@@ -348,26 +304,59 @@ loadQuestion()
 
 }
 
+/* LOAD QUESTION */
+
 function loadQuestion(){
 
-let q = currentQuiz[currentQuestion]
+clearInterval(timer)
 
-document.getElementById("question").textContent=q.question
+timeLeft=15
 
-let optionsHTML=""
+document.getElementById("timer").textContent=timeLeft
 
-q.options.forEach(option=>{
+timer=setInterval(()=>{
 
-optionsHTML+=
-`<button onclick="selectAnswer(this,'${option}')">${option}</button>`
+timeLeft--
 
-})
+document.getElementById("timer").textContent=timeLeft
 
-document.getElementById("options").innerHTML=optionsHTML
+if(timeLeft===0){
+
+clearInterval(timer)
+
+nextQuestion()
 
 }
 
+},1000)
+
+let q=currentQuiz[currentQuestion]
+
+document.getElementById("question").textContent=q.question
+
+document.getElementById("questionNumber").textContent =
+`Question ${currentQuestion+1}/${currentQuiz.length}`
+
+document.getElementById("progress").style.width =
+((currentQuestion)/currentQuiz.length)*100+"%"
+
+let html=""
+
+q.options.forEach(option=>{
+
+html+=`<button onclick="selectAnswer(this,'${option}')">${option}</button>`
+
+})
+
+document.getElementById("options").innerHTML=html
+
+}
+
+/* SELECT */
+
 function selectAnswer(btn,option){
+
+clearInterval(timer)
 
 let correct=currentQuiz[currentQuestion].answer
 
@@ -380,6 +369,8 @@ if(option===correct){
 btn.classList.add("correct")
 
 score++
+
+localStorage.setItem("quizScore",score)
 
 }else{
 
@@ -395,9 +386,13 @@ b.classList.add("correct")
 
 }
 
+/* NEXT */
+
 function nextQuestion(){
 
 currentQuestion++
+
+localStorage.setItem("quizQuestion",currentQuestion)
 
 if(currentQuestion < currentQuiz.length){
 
@@ -411,25 +406,68 @@ finishQuiz()
 
 }
 
+/* FINISH */
+
 function finishQuiz(){
 
 document.getElementById("quizSection").style.display="none"
 
 document.getElementById("scoreSection").style.display="block"
 
-let user =
-localStorage.getItem("quizCurrentUser")
-
 document.getElementById("scoreText").innerHTML =
-`${user}, your score is ${score}/${currentQuiz.length}`
+`Your Score: ${score}/${currentQuiz.length}`
+
+saveLeaderboard(score)
+
+localStorage.clear()
 
 }
 
+/* LEADERBOARD */
 
+function saveLeaderboard(score){
 
+let board =
+JSON.parse(localStorage.getItem("leaderboard")) || []
+
+board.push(score)
+
+board.sort((a,b)=>b-a)
+
+board = board.slice(0,5)
+
+localStorage.setItem("leaderboard",JSON.stringify(board))
+
+loadLeaderboard()
+
+}
+
+function loadLeaderboard(){
+
+let board =
+JSON.parse(localStorage.getItem("leaderboard")) || []
+
+let html=""
+
+board.forEach((s,i)=>{
+
+html+=`<li>#${i+1} — ${s} pts</li>`
+
+})
+
+document.getElementById("leaderboardList").innerHTML=html
+
+}
+
+loadLeaderboard()
+
+function restartQuiz(){
+
+location.reload()
+
+}
 
 </script>
 
 </body>
-
 </html>
