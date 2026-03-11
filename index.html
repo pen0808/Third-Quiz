@@ -134,7 +134,7 @@ grid-template-columns:1fr 1fr;
 </header>
 
 <main>
-  <section id="authSection" class="card">
+<!--<section id="authSection" class="card">
 
 <h2>Start Quiz</h2>
 
@@ -144,7 +144,7 @@ grid-template-columns:1fr 1fr;
 
 <button onclick="playGuest()">Play as Guest</button>
 
-</section>
+</section> -->
 
 <!-- LOGIN / SIGNUP -->
 
@@ -425,74 +425,8 @@ document.getElementById("scoreText").innerHTML =
 
 }
 
-const firebaseConfig = {
-apiKey: "AIzaSyBT2lJAmVk0DSeeCqGCFmNHWYij_o0aOWU",
-authDomain: "quiz-1691e.firebaseapp.com",
-projectId: "quiz-1691e",
-appId: "1:827524171077:web:e0d319b3c321c62fcc2a2c",
-};
 
-firebase.initializeApp(firebaseConfig);
 
-const auth = firebase.auth();
-
-const provider = new firebase.auth.GoogleAuthProvider();
-
-document.getElementById("googleLogin")
-.addEventListener("click", function(){
-
-auth.signInWithPopup(provider)
-.then((result)=>{
-
-const user = result.user;
-
-localStorage.setItem("quizUserName", user.displayName);
-localStorage.setItem("quizUserEmail", user.email);
-localStorage.setItem("quizUserPhoto", user.photoURL);
-
-startCategories();
-
-})
-.catch((error)=>{
-console.log(error);
-});
-
-});
-
-function playGuest(){
-
-localStorage.setItem("quizUserName","Guest");
-
-startCategories();
-
-}
-
-firebase.auth().onAuthStateChanged((user)=>{
-
-if(user){
-
-localStorage.setItem("quizUserName", user.displayName);
-
-startCategories();
-
-}
-
-});
-
-const username = localStorage.getItem("quizUserName");
-
-document.getElementById("welcomeUser").textContent =
-"Welcome " + username;
-
-function logout(){
-
-firebase.auth().signOut();
-
-localStorage.clear();
-
-location.reload();
-
-}
 
 </script>
 
